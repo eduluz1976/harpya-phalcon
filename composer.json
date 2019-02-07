@@ -1,0 +1,26 @@
+{
+    "name": "harpya/phalcon",
+    "description": "Framework to build micro applications over Phalcon.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eduardo Luz",
+            "email": "eduluz.canada@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload" : {
+        "psr-4": {
+            "harpya\\phalcon\\" : "src/"
+        }
+    },
+    "require": {
+        "vlucas/phpdotenv": "^3.1",
+        "eduluz1976/action": "^0.1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5"
+    }
+
+}
