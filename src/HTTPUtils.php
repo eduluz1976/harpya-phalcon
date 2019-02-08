@@ -12,20 +12,35 @@ trait HTTPUtils
     protected $response;
     protected $json;
 
+    /**
+     * @return Request
+     */
     public function getRequest()
     {
+        if (!$this->request) {
+            $this->request = new Request();
+        }
         return $this->request;
     }
 
+    /**
+     * @return Response
+     */
     public function getResponse()
     {
+        if (!$this->response) {
+            $this->response = new Response();
+        }
         return $this->response;
     }
 
+    /**
+     * @param string $filename
+     */
     protected function loadRoutes($filename)
     {
-        $this->request = new Request();
-        $this->response = new Response();
+        $this->getRequest();
+        $this->getResponse();
 
         $this->getRouter()->setUriSource(\Phalcon\Mvc\Router::URI_SOURCE_SERVER_REQUEST_URI);
 
@@ -35,11 +50,20 @@ trait HTTPUtils
         }
     }
 
+    /**
+     * Check the request and decide which route will be invoked.
+     */
     public function handleRoutes()
     {
         $this->handle();
     }
 
+    /**
+     * Add an alternative action, if there is nothing that matches
+     * whith the loaded routes
+     *
+     * @param mixed $sTarget
+     */
     public function addRouteNotFound($sTarget)
     {
         $app = &$this;
@@ -51,6 +75,12 @@ trait HTTPUtils
         );
     }
 
+    /**
+     * @param string $route
+     * @param string $sTarget
+     * @param array $vars
+     * @return mixed
+     */
     public function addGet($route, $sTarget, $vars = [])
     {
         $app = &$this;
@@ -61,15 +91,14 @@ trait HTTPUtils
                 $app->execRequest($app, $sTarget, $vars, $values);
             }
         )->via('GET');
-
-        return  $this->get(
-            $route,
-            function (...$values) use ($app, $sTarget,$vars) {
-                $app->execRequest($app, $sTarget, $vars, $values);
-            }
-        );
     }
 
+    /**
+     * @param string $route
+     * @param string $sTarget
+     * @param array $vars
+     * @return mixed
+     */
     public function addOption($route, $sTarget, $vars = [])
     {
         $app = &$this;
@@ -82,11 +111,17 @@ trait HTTPUtils
         )->via('OPTIONS');
     }
 
+    /**
+     * @param string $route
+     * @param string $sTarget
+     * @param array $vars
+     * @return mixed
+     */
     public function addDelete($route, $sTarget, $vars = [])
     {
         $app = &$this;
 
-        $this->delete(
+        return $this->delete(
             $route,
             function (...$values) use ($app, $sTarget,$vars) {
                 $app->execRequest($app, $sTarget, $vars, $values);
@@ -94,6 +129,12 @@ trait HTTPUtils
         );
     }
 
+    /**
+     * @param string $route
+     * @param string $sTarget
+     * @param array $vars
+     * @return mixed
+     */
     public function addPost($route, $sTarget, $vars = [])
     {
         $app = &$this;
@@ -106,11 +147,17 @@ trait HTTPUtils
         );
     }
 
+    /**
+     * @param string $route
+     * @param string $sTarget
+     * @param array $vars
+     * @return mixed
+     */
     public function addPut($route, $sTarget, $vars = [])
     {
         $app = &$this;
 
-        $this->put(
+        return $this->put(
             $route,
             function (...$values) use ($app, $sTarget,$vars) {
                 $app->execRequest($app, $sTarget, $vars, $values);
@@ -118,6 +165,14 @@ trait HTTPUtils
         );
     }
 
+    /**
+     * @param Application $app
+     * @param string $sTarget
+     * @param array $vars
+     * @param array $values
+     * @throws \eduluz1976\action\exception\FunctionNotFoundException
+     * @throws \eduluz1976\action\exception\InvalidURIException
+     */
     protected function execRequest($app, $sTarget, $vars = [], $values = [])
     {
         $target = \eduluz1976\action\Action::factory($sTarget);
@@ -135,6 +190,9 @@ trait HTTPUtils
         $app->getResponse()->send();
     }
 
+    /**
+     * @param Application $app
+     */
     protected function checkRequest($app)
     {
         $raw = trim($app->getRequest()->getRawBody());
@@ -146,6 +204,10 @@ trait HTTPUtils
         }
     }
 
+    /**
+     * @param mixed $key
+     * @return array
+     */
     public function getJSON($key = false)
     {
         if (!$key) {
@@ -157,6 +219,10 @@ trait HTTPUtils
         }
     }
 
+    /**
+     * @param array $middlewareList
+     * @throws \Exception
+     */
     public function loadMiddleware($middlewareList = [])
     {
         $eventsManager = new Manager();
