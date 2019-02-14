@@ -76,6 +76,59 @@ trait HTTPUtils
     }
 
     /**
+     * @param $route
+     * @param $sTarget
+     * @param array $vars
+     * @return mixed
+     */
+    public function get($route, $sTarget, $vars = []) {
+        return $this->addGet($route,$sTarget,$vars);
+    }
+
+    /**
+     * @param $route
+     * @param $sTarget
+     * @param array $vars
+     * @return mixed
+     */
+    public function post($route, $sTarget, $vars = []) {
+        return $this->addPost($route,$sTarget,$vars);
+    }
+
+
+    /**
+     * @param $route
+     * @param $sTarget
+     * @param array $vars
+     * @return mixed
+     */
+    public function options($route, $sTarget, $vars = []) {
+        return $this->addOption($route,$sTarget,$vars);
+    }
+
+    /**
+     * @param $route
+     * @param $sTarget
+     * @param array $vars
+     * @return mixed
+     */
+    public function put($route, $sTarget, $vars = []) {
+        return $this->addPut($route,$sTarget,$vars);
+    }
+
+
+    /**
+     * @param $route
+     * @param $sTarget
+     * @param array $vars
+     * @return mixed
+     */
+    public function delete($route, $sTarget, $vars = []) {
+        return $this->addDelete($route,$sTarget,$vars);
+    }
+
+
+    /**
      * @param string $route
      * @param string $sTarget
      * @param array $vars
