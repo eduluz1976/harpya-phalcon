@@ -2,6 +2,10 @@
 
 namespace harpya\phalcon;
 
+/**
+ * Trait Singleton
+ * @package harpya\phalcon
+ */
 trait Singleton
 {
     protected static $instance;

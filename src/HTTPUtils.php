@@ -6,6 +6,10 @@ use \Phalcon\Http\Request;
 use \Phalcon\Http\Response;
 use \Phalcon\Events\Manager;
 
+/**
+ * Trait HTTPUtils
+ * @package harpya\phalcon
+ */
 trait HTTPUtils
 {
     protected $request;
@@ -13,14 +17,23 @@ trait HTTPUtils
     protected $json;
 
     /**
-     * @return Request
+     * @return \harpya\phalcon\Request
      */
     public function getRequest()
     {
         if (!$this->request) {
-            $this->request = new Request();
+            $this->initRequest();
         }
         return $this->request;
+    }
+
+    /**
+     * Initialize the request property, with a
+     * brand new \harpya\phalcon\Request object
+     */
+    public function initRequest()
+    {
+        $this->request = new \harpya\phalcon\Request();
     }
 
     /**
@@ -174,12 +187,12 @@ trait HTTPUtils
     {
         $app = &$this;
 
-        return $this->delete(
+        return $this->map(
             $route,
             function (...$values) use ($app, $sTarget,$vars) {
                 $app->execRequest($app, $sTarget, $vars, $values);
             }
-        );
+        )->via('DELETE');
     }
 
     /**
@@ -192,12 +205,12 @@ trait HTTPUtils
     {
         $app = &$this;
 
-        return $this->post(
+        return $this->map(
             $route,
             function (...$values) use ($app, $sTarget,$vars) {
                 $app->execRequest($app, $sTarget, $vars, $values);
             }
-        );
+        )->via('POST');
     }
 
     /**
@@ -210,12 +223,12 @@ trait HTTPUtils
     {
         $app = &$this;
 
-        return $this->put(
+        return $this->map(
             $route,
             function (...$values) use ($app, $sTarget,$vars) {
                 $app->execRequest($app, $sTarget, $vars, $values);
             }
-        );
+        )->via('PUT');
     }
 
     /**
@@ -286,7 +299,13 @@ trait HTTPUtils
                     throw new \Exception("Class $className does not exists", 1);
                     continue;
                 }
-                $eventsManager->attach('micro', new $className);
+                $obj = new $className;
+
+                if ($this->checkIfImplements($className)) {
+                    $obj->setApplication($this);
+                }
+
+                $eventsManager->attach('micro', $obj);
 
                 switch ($step) {
                     case 'before':
@@ -297,5 +316,19 @@ trait HTTPUtils
         }
 
         $this->setEventsManager($eventsManager);
+    }
+
+    /**
+     * @param $className
+     * @return bool
+     */
+    protected function checkIfImplements($className)
+    {
+        $l = class_implements($className);
+        if (isset($l['harpya\phalcon\interfaces\AccessApplication'])) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -2,6 +2,12 @@
 
 namespace harpya\phalcon;
 
+/**
+ * Manage a list of routes that could be executed without any authentication
+ *
+ * Trait Whitelist
+ * @package harpya\phalcon
+ */
 trait Whitelist
 {
     protected $whitelist = [];
