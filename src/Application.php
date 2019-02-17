@@ -2,6 +2,7 @@
 
 namespace harpya\phalcon;
 
+use harpya\api_auth\Core;
 use Phalcon\Http\Request;
 use Phalcon\Http\Response;
 
@@ -16,6 +17,9 @@ class Application extends \Phalcon\Mvc\Micro
     use Whitelist;
     use Singleton;
     use Env;
+
+    protected $authManager;
+
 
     /**
      * Application constructor.
@@ -41,6 +45,10 @@ class Application extends \Phalcon\Mvc\Micro
             $this->loadConfig($props['config']);
         }
 
+        if (isset($props['auth'])) {
+            $this->loadAuth($props['auth']);
+        }
+
         if (isset($props['middleware'])) {
             $this->loadMiddleware($props['middleware']);
         }
@@ -51,19 +59,59 @@ class Application extends \Phalcon\Mvc\Micro
     }
 
     /**
+     * @param array $props
+     * @throws \Exception
+     */
+    protected function loadAuth($props = [])
+    {
+        $filename = getenv('HARPYA_AUTH_OUTPUT_MASTER_FILE');
+        $additional = [Core::PROP_OUTPUT_FILENAME => $filename];
+
+        $props = array_replace($additional, $props);
+
+        $this->getAuthManager($props);
+        $this->getAuthManager()->loadMasterKey();
+    }
+
+    /**
+     * @param array $props
+     * @return Core
+     */
+    public function getAuthManager($props = [])
+    {
+        if (!$this->authManager) {
+            $this->authManager = new Core($props);
+        }
+        return $this->authManager;
+    }
+
+    /**
      * Execute the application routing logic. Handles the request and try to match
      * to any rule already existent.
      */
     public function exec()
     {
+        $exception = false;
         try {
             $this->handleRoutes();
-        } catch (\Exception $e) {
+        } catch (\harpya\phalcon\Exception\RuntimeException $e) {
             $resp = ['msg' => $e->getMessage(), 'code' => $e->getCode()];
-            $this->getResponse()->setContent(json_encode($resp))
-                ->setHeader('Content-Type', 'text/json')
-                ->setStatusCode(400, 'OK')
-                ->send();
+
+            if ($e->getForcedHttpCode()) {
+                $exception = $e->getForcedHttpCode();
+            } else {
+                $exception = 400;
+            }
+        } catch (\Exception $e) {
+            $exception = 400;
+            $resp = ['msg' => $e->getMessage(), 'code' => $e->getCode()];
+        } finally {
+            if ($exception) {
+                $this->getResponse()->setContent(json_encode($resp))
+                    ->setHeader('Content-Type', 'text/json')
+                    ->setStatusCode($exception, 'Ok')
+                    ->send();
+            }
         }
     }
 }
