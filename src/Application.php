@@ -19,6 +19,15 @@ class Application extends \Phalcon\Mvc\Micro
     use Env;
 
     protected $authManager;
+    protected $logHandler;
+
+    /**
+     * @return harpya\phalcon\interfaces\ReportHandler
+     */
+    public function getLogHandler()
+    {
+        return $this->logHandler;
+    }
 
 
     /**
@@ -37,13 +46,19 @@ class Application extends \Phalcon\Mvc\Micro
      */
     protected function setProps($props = [])
     {
+        if (isset($props['config'])) {
+            $this->loadConfig($props['config']);
+        }
+
+        if (isset($props['log'])) {
+            $this->loadLogHandler($props['log']);
+        }
+
+
         if (isset($props['di'])) {
             parent::__construct($props['di']);
         }
 
-        if (isset($props['config'])) {
-            $this->loadConfig($props['config']);
-        }
 
         if (isset($props['auth'])) {
             $this->loadAuth($props['auth']);
@@ -52,6 +67,7 @@ class Application extends \Phalcon\Mvc\Micro
         if (isset($props['middleware'])) {
             $this->loadMiddleware($props['middleware']);
         }
+
 
         if (isset($props['routes'])) {
             $this->loadRoutes($props['routes']);
@@ -107,6 +123,9 @@ class Application extends \Phalcon\Mvc\Micro
             $resp = ['msg' => $e->getMessage(), 'code' => $e->getCode()];
         } finally {
             if ($exception) {
+
+                $this->getLogHandler()->logException($e);
+
                 $this->getResponse()->setContent(json_encode($resp))
                     ->setHeader('Content-Type', 'text/json')
                     ->setStatusCode($exception, 'Ok')
@@ -114,4 +133,10 @@ class Application extends \Phalcon\Mvc\Micro
             }
         }
     }
+
+
+    protected function loadLogHandler($logHandler=[]) {
+        $this->logHandler = reset($logHandler);
+    }
+
 }
