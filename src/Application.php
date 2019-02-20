@@ -128,15 +128,26 @@ class Application extends \Phalcon\Mvc\Micro
 
                 $this->getResponse()->setContent(json_encode($resp))
                     ->setHeader('Content-Type', 'text/json')
-                    ->setStatusCode($exception, 'Ok')
+                    ->setStatusCode($exception, 'Error')
                     ->send();
             }
         }
     }
 
 
-    protected function loadLogHandler($logHandler=[]) {
-        $this->logHandler = reset($logHandler);
+    /**
+     * @param array $logHandler
+     * @param int $index
+     */
+    protected function loadLogHandler($logHandler=[], $index=0) {
+
+        if (isset($logHandler[$index])) {
+            $this->logHandler = $logHandler[$index];
+        } else {
+            $this->logHandler = reset($logHandler);
+        }
+
+
     }
 
 }
