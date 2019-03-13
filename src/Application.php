@@ -3,6 +3,7 @@
 namespace harpya\phalcon;
 
 use harpya\api_auth\Core;
+use harpya\phalcon\Report\NullReport;
 use Phalcon\Http\Request;
 use Phalcon\Http\Response;
 
@@ -52,6 +53,8 @@ class Application extends \Phalcon\Mvc\Micro
 
         if (isset($props['log'])) {
             $this->loadLogHandler($props['log']);
+        } else {
+            $this->loadLogHandler([ new NullReport() ]);
         }
 
 
