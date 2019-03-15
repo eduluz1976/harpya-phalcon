@@ -51,7 +51,7 @@ class Application extends \Phalcon\Mvc\Micro
             $this->loadConfig($props['config']);
         }
 
-        if (isset($props['log'])) {
+        if (isset($props['log']) && !empty($props['log'])) {
             $this->loadLogHandler($props['log']);
         } else {
             $this->loadLogHandler([ new NullReport() ]);

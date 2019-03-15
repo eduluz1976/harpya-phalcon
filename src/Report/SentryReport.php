@@ -5,64 +5,30 @@ namespace harpya\phalcon\Report;
 use harpya\phalcon\interfaces\ReportHandler;
 use harpya\phalcon\Report;
 
+/**
+ *
+ * Class SentryReport
+ * @package harpya\phalcon\Report
+ */
 class SentryReport extends Report implements ReportHandler {
 
-    protected $client;
-    protected $errorHandler;
-
     /**
-     * @return \Raven_Client
+     * SentryReport constructor.
+     * @param $dsn
+     * @param array $options
      */
-    public function getClient(): \Raven_Client
-    {
-        return $this->client;
-    }
-
-    /**
-     * @param \Raven_Client $client
-     * @return SentryReport
-     */
-    public function setClient(\Raven_Client $client): SentryReport
-    {
-        $this->client = $client;
-        return $this;
-    }
-
-    /**
-     * @return \Raven_ErrorHandler
-     */
-    public function getErrorHandler(): \Raven_ErrorHandler
-    {
-        return $this->errorHandler;
-    }
-
-    /**
-     * @param \Raven_ErrorHandler $errorHandler
-     * @return SentryReport
-     */
-    public function setErrorHandler(\Raven_ErrorHandler $errorHandler): SentryReport
-    {
-        $this->errorHandler = $errorHandler;
-        return $this;
-    }
-
-
-
     public function __construct($dsn, $options=[])
     {
-        $this->setClient(new \Raven_Client($dsn,$options));
-        $this->setErrorHandler(new \Raven_ErrorHandler($this->getClient()));
-        $this->getErrorHandler()->registerExceptionHandler();
-        $this->getErrorHandler()->registerErrorHandler();
-        $this->getErrorHandler()->registerShutdownFunction();
+        $options['dsn'] = $dsn;
+        \Sentry\init($options);
     }
 
-
-
-
-
+    /**
+     * @param $ex
+     * @param array $additionalData
+     */
     public function logException($ex, $additionalData = [])
     {
-        $this->getClient()->captureException($ex, $additionalData);
+        \Sentry\captureException($ex);
     }
 }
