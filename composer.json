@@ -18,11 +18,11 @@
     "require": {
         "vlucas/phpdotenv": "^3.1",
         "eduluz1976/action": "^0.1.0",
-        "harpya/api-auth": "^1.0",
-        "sentry/sentry": "^1.10"
+        "harpya/api-auth": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.5"
+        "phpunit/phpunit": "^7.5",
+        "sentry/sentry": "^1.10"
     }
 
 }

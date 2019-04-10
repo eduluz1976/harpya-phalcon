@@ -39,7 +39,13 @@ class RequestMiddleware implements MiddlewareInterface
             return false;
         }
 
-        $_POST = array_replace($_POST, $json);
+        if (!is_array($json)) {
+            $json = [];
+        }
+
+        $postVars = (isset($_POST) && is_array($_POST))?$_POST:[];
+
+        $_POST = array_replace($postVars, $json);
         Application::getInstance()->initRequest();
 
         return true;
