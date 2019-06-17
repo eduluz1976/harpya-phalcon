@@ -2,6 +2,10 @@
 
 namespace harpya\phalcon;
 
+/**
+ * Trait Env
+ * @package harpya\phalcon
+ */
 trait Env
 {
     /**

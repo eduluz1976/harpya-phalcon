@@ -2,6 +2,10 @@
 
 namespace harpya\phalcon;
 
+/**
+ * Class Config
+ * @package harpya\phalcon
+ */
 class Config
 {
     protected $values = [];
